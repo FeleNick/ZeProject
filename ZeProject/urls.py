@@ -17,11 +17,14 @@ from django.contrib import admin
 from django.urls import path, include
 from myapp import views as myapp_views
 from register import views as v
+from CNjokes import views as j
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('myapp.urls')),
     path('register/', v.register, name="register"),
     path('', include("django.contrib.auth.urls")),
+    path('jokes/', j.likedjokes_view, name="jokes"),
+    path('joke/', j.cnjoke_view, name="joke"),
 
 ]

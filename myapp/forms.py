@@ -29,3 +29,7 @@ class TaskEdit(forms.ModelForm):
         super().__init__(*args, **kwargs)
         if kwargs.get('instance'):
             self.fields['task_name'].initial = kwargs['instance'].task_name   
+
+
+
+           

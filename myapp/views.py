@@ -2,6 +2,9 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.views.generic import CreateView
 from .forms import ItemForm, TaskForm, TaskEdit
 from .models import Item, Task
+ 
+
+
 
 def index(request):
     if not request.user.is_authenticated:
@@ -77,4 +80,6 @@ def edit_task(request, id):
 def delete_task(request, id):
     task = get_object_or_404(Task, pk=id)
     task.delete()
-    return redirect('index')        
+    return redirect('index') 
+
+

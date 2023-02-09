@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'myapp.apps.MyappConfig',
     'register.apps.RegisterConfig',
     'crispy_forms',
+    'CNjokes'
 ]
 
 MIDDLEWARE = [
