@@ -1,85 +1,72 @@
-from django.shortcuts import get_object_or_404, render, redirect
-from django.views.generic import CreateView
-from .forms import ItemForm, TaskForm, TaskEdit
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse_lazy
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from .forms import ItemForm, TaskForm
 from .models import Item, Task
- 
 
 
+class IndexView(LoginRequiredMixin, ListView):
+    template_name = 'myapp/index.html'
+    model = Task
 
-def index(request):
-    if not request.user.is_authenticated:
-        return redirect('login')
-    user = request.user
-    tasks = Task.objects.filter(user=request.user)
-    context = {
-        'tasks': tasks
-    }
-    return render(request, 'myapp/index.html', context)
+    def get_queryset(self):
+        return Task.objects.filter(user=self.request.user)
 
-def create_item(request):
-    if request.method == 'POST':
-        form = ItemForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('index')
-    else:
-        form = ItemForm()
-    context = {
-        'form': form
-    }
-    return render(request, 'myapp/create.html', context)
 
-def edit_item(request, id):
-    item = Item.objects.get(id=id)
-    if request.method == 'POST':
-        form = ItemForm(request.POST, instance=item)
-        if form.is_valid():
-            form.save()
-            return redirect('index')
-    else:
-        form = ItemForm(instance=item)
-    context = {
-        'form': form
-    }
-    return render(request, 'myapp/edit.html', context)
+class ItemCreateView(LoginRequiredMixin, CreateView):
+    template_name = 'myapp/create.html'
+    form_class = ItemForm
+    success_url = reverse_lazy('index')
 
-def delete_item(request, id):
-    item = Item.objects.get(id=id)
-    item.delete()
-    return redirect('index')
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
 
-def task_view(request, id=None):
-    if id:
-        task = get_object_or_404(Task, pk=id)
-    else:
-        task = Task(user=request.user)
 
-    if request.method == 'POST':
-        form = TaskForm(request.POST, instance=task, initial={'task_name': task.task_name})
-        if form.is_valid():
-            form.save()
-            return redirect('index')
-    else:
-        form = TaskForm(instance=task)
-    return render(request, 'myapp/task_form.html', {'form': form})
+class ItemUpdateView(LoginRequiredMixin, UpdateView):
+    template_name = 'myapp/edit.html'
+    form_class = ItemForm
+    model = Item
+    success_url = reverse_lazy('index')
 
-def edit_task(request, id):
-    task = get_object_or_404(Task, pk=id)
-    form_title = 'Edit Task'
-    if request.method == 'POST':
-        form = TaskForm(request.POST, instance=task)
-        form_title = form.fields['task_name'].initial or 'Nope'
-        if form.is_valid():
-            form.save()
-            return redirect('index')
-    else:
-        form = TaskForm(instance=task)
-        
-    return render(request, 'myapp/task_edit.html', {'form': form, 'form_title': form_title})
 
-def delete_task(request, id):
-    task = get_object_or_404(Task, pk=id)
-    task.delete()
-    return redirect('index') 
+class ItemDeleteView(LoginRequiredMixin, DeleteView):
+    model = Item
+    success_url = reverse_lazy('index')
+
+    def get(self, request, *args, **kwargs):
+        return self.post(request, *args, **kwargs)
+
+
+class TaskView(LoginRequiredMixin, CreateView):
+    template_name = 'myapp/task_form.html'
+    form_class = TaskForm
+    success_url = reverse_lazy('index')
+    model = Task
+
+    def get_initial(self):
+        task_name = self.kwargs.get('task_name', '')
+        return {'task_name': task_name}
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+
+
+class TaskUpdateView(LoginRequiredMixin, UpdateView):
+    template_name = 'myapp/task_edit.html'
+    form_class = TaskForm
+    model = Task
+    success_url = reverse_lazy('index')
+    
+
+class TaskDeleteView(LoginRequiredMixin, DeleteView):
+    model = Task
+    success_url = reverse_lazy('index')
+
+    def get(self, request, *args, **kwargs):
+        return self.post(request, *args, **kwargs)
+    
+    
 
 

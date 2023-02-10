@@ -1,13 +1,13 @@
 {% extends "myapp/base.html" %}
 
-{% block title %}Liked Chuck Norris Jokes{% endblock %}
+{% block title %}Most Liked Chuck Norris Jokes{% endblock %}
 
 {% block content %}
-    <h2>Liked Chuck Norris Jokes</h2>
+    <h2>Most Liked Chuck Norris Jokes</h2>
     <ul>
         {% for joke in object_list %}
             <li>
-                {{ joke.joke }}
+                {{ joke.joke }} ({{ joke.likes }} likes)
             </li>
         {% endfor %}
     </ul>

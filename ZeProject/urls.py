@@ -22,9 +22,10 @@ from CNjokes import views as j
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('myapp.urls')),
-    path('register/', v.register, name="register"),
+    path('register/', v.RegisterView.as_view(), name="register"),
     path('', include("django.contrib.auth.urls")),
-    path('jokes/', j.likedjokes_view, name="jokes"),
-    path('joke/', j.cnjoke_view, name="joke"),
+    path('jokes/', j.LikedJokesView.as_view(), name="jokes"),
+    path('joke/', j.CNJokeView.as_view(), name="joke"),
+    path('most-liked-jokes/', j.MostLikedJokesView.as_view(), name='most_liked_jokes'),
 
 ]
