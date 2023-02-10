@@ -34,3 +34,4 @@ These instructions will get you a copy of the project up and running on your loc
 3. Create new users using the register page
 4. Create, view, edit and delete tasks using different users.
 5. See random Chuck Norris jokes and save them to user specific joke libraies
+6. See what other users liked on the "Best Chucks" page.
