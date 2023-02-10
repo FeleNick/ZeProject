@@ -8,6 +8,7 @@
         {% for joke in object_list %}
             <li>
                 {{ joke.joke }}
+                <a href="{% url 'delete_joke' joke.pk %}">Delete</a>
             </li>
         {% endfor %}
     </ul>

@@ -8,6 +8,7 @@ class CNJoke(models.Model):
     joke = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     liked_by = models.ManyToManyField(User, related_name='liked_jokes')
+    number_of_likes = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return self.joke

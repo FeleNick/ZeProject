@@ -27,5 +27,6 @@ urlpatterns = [
     path('jokes/', j.LikedJokesView.as_view(), name="jokes"),
     path('joke/', j.CNJokeView.as_view(), name="joke"),
     path('most-liked-jokes/', j.MostLikedJokesView.as_view(), name='most_liked_jokes'),
+    path('jokes/<int:pk>/delete/', j.CannotDeleteView.as_view(), name='delete_joke'),
 
 ]

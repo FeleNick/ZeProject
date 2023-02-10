@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.db.models import Count
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import CreateView, ListView
+from django.views.generic import CreateView, ListView, TemplateView
 from .forms import CNJokeForm
 from .models import CNJoke
 import requests
@@ -18,10 +18,21 @@ class CNJokeView(LoginRequiredMixin, CreateView):
         return {'joke': joke}
 
     def form_valid(self, form):
-        joke = form.save(commit=False)
-        joke.user = self.request.user
-        joke.save()
-        joke.liked_by.add(self.request.user)
+        joke_text = form.cleaned_data.get('joke')
+        user = self.request.user
+
+        try:
+            joke = CNJoke.objects.get(joke=joke_text)
+            joke.number_of_likes += 1
+            joke.save()
+            joke.liked_by.add(user)
+        except CNJoke.DoesNotExist:
+            joke = form.save(commit=False)
+            joke.user = user
+            joke.number_of_likes = 1
+            joke.save()
+            joke.liked_by.add(user)
+
         return super().form_valid(form)
 
 class LikedJokesView(LoginRequiredMixin, ListView):
@@ -29,7 +40,7 @@ class LikedJokesView(LoginRequiredMixin, ListView):
     model = CNJoke
 
     def get_queryset(self):
-        return CNJoke.objects.filter(user=self.request.user)
+        return self.request.user.liked_jokes.all()
     
 
 class MostLikedJokesView(ListView):
@@ -37,5 +48,9 @@ class MostLikedJokesView(ListView):
     model = CNJoke
 
     def get_queryset(self):
-        return CNJoke.objects.annotate(likes=Count('liked_by')).order_by('-likes')[:5]
+        return CNJoke.objects.annotate(num_likes=Count('liked_by')).order_by('-number_of_likes')[:5]
+    
+
+class CannotDeleteView(TemplateView):
+    template_name = 'cnjokes/cannot_delete.html'
         
